@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生日快乐 | 卡塞尔学院</title>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:system-ui, -apple-system, sans-serif;
+}
+body{
+  min-height:100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(218,165,32,0.08), transparent 35%),
+    linear-gradient(180deg, #050505 0%, #111111 45%, #080808 100%);
+  color:#fff;
+  text-align:center;
+  position:relative;
+}
+#canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:1;
+}
+.wrap{
+  position:relative;
+  z-index:3;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  padding-bottom:60px;
+}
+.badge{
+  width:186px;
+  height:186px;
+  border-radius:50%;
+  border:3px solid rgba(218,165,32,0.65);
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,215,0,0.12), transparent 35%),
+    linear-gradient(135deg, #1a1a1a, #0d0d0d);
+  box-shadow:
+    0 0 34px rgba(218,165,32,0.45),
+    inset 0 0 22px rgba(218,165,32,0.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:28px;
+  position:relative;
+  overflow:hidden;
+}
+.badge img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  filter: drop-shadow(0 0 12px rgba(218,165,32,0.65));
+}
+h1{
+  font-size:clamp(2.2rem,9vw,3.2rem);
+  color:gold;
+  margin-bottom:20px;
+  letter-spacing:3px;
+  text-shadow:
+    0 0 10px rgba(255,215,0,0.75),
+    0 0 20px rgba(255,215,0,0.4);
+}
+.content{
+  max-width:560px;
+  font-size:clamp(1rem,4vw,1.3rem);
+  line-height:2;
+  color:rgba(255,255,255,0.85);
+  background:rgba(18,18,18,0.7);
+  border:1px solid rgba(218,165,32,0.28);
+  border-radius:16px;
+  padding:26px 30px;
+  box-shadow:0 0 24px rgba(218,165,32,0.14);
+}
+.content p{
+  margin-bottom:14px;
+}
+.sign{
+  margin-top:20px;
+  font-size:0.95rem;
+  color:rgba(218,165,32,0.78);
+  letter-spacing:1px;
+}
+.dragon-line{
+  position:absolute;
+  width:200px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(218,165,32,0.65), transparent);
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  box-shadow:0 0 14px rgba(218,165,32,0.45);
+}
+.bottom-name{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  font-size:0.95rem;
+  color:gold;
+  letter-spacing:1px;
+  text-shadow:
+    0 0 8px rgba(255,215,0,0.8),
+    0 0 16px rgba(255,215,0.5);
+  z-index:4;
+}
+/* ========== 音乐播放器：左下角小圆点 ========== */
+.music-wrap {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 6;
+}
+.music-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(218, 165, 32, 0.65);
+  background: #111;
+  color: gold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(218, 165, 32, 0.35);
+  transition: 0.25s;
+}
+.music-dot:hover {
+  box-shadow: 0 0 22px rgba(218, 165, 32, 0.6);
+}
+.music-panel {
+  position: absolute;
+  left: 0;
+  bottom: 54px;
+  width: 140px;
+  background: rgba(12, 12, 12, 0.88);
+  border: 1px solid rgba(218, 165, 32, 0.35);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 0 18px rgba(218, 165, 32, 0.18);
+  text-align: center;
+  display: none;
+}
+.music-panel.show {
+  display: block;
+}
+.music-title {
+  color: gold;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.music-toggle {
+  background: #1c1c1c;
+  color: #fff;
+  border: 1px solid rgba(218, 165, 32, 0.45);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto;
+  font-size: 16px;
+}
+.music-toggle:hover {
+  border-color: gold;
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.4);
+}
+.music-toggle.playing {
+  color: gold;
+}
+audio {
+  display: none;
+}
+@media(max-width:480px){
+  .badge{
+    width:156px;
+    height:156px;
+  }
+  .content{
+    padding:20px 22px;
+  }
+  .bottom-name{
+    right:12px;
+    bottom:12px;
+    font-size:0.85rem;
+  }
+  .music-wrap{
+    left:12px;
+    bottom:12px;
+  }
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="wrap">
+  <div class="dragon-line"></div>
+  <div class="badge">
+    <img src="https://s41.ax1x.com/2026/10/06/pntkM8J.jpg">
+  </div>
+  <h1>生日蛋糕是青春的墓碑</h1>
+  <div class="content">
+    <p>8月26日，属于你的日子。</p>
+    <p>愿新岁，你的黄金瞳永远明亮。</p>
+    <p>纵然世间有龙影蛰伏，也愿你被温柔与好运庇护。</p>
+    <p>不必活成别人的英雄，只做属于自己的光。</p>
+    <p>前路浩荡，万事尽可期待。</p>
+    <p class="sign">
+      ——卡塞尔学院
+    </p>
+  </div>
+</div>
+<!-- 音乐播放器：左下角小圆点 + 弹出小方块 -->
+<div class="music-wrap">
+  <div class="music-dot">♪</div>
+  <div class="music-panel">
+    <div class="music-title">心似烟火</div>
+    <button class="music-toggle" id="musicToggle">▶</button>
+  </div>
+  <audio id="bgAudio" preload="metadata" loop>
+    <source src="xinshiyanhuo.mp3" type="audio/mpeg">
+  
+</div>
+<div class="bottom-name">佟浩嘉</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let w,h;
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+// 龙鳞飘落粒子
+class ScaleParticle{
+  constructor(){
+    this.x = Math.random() * w;
+    this.y = -30;
+    this.size = Math.random() * 4 + 1.5;
+    this.speedY = Math.random() * 1.2 + 0.6;
+    this.speedX = (Math.random()-0.5)*0.6;
+    this.rotate = Math.random()*Math.PI*2;
+    this.rotateSpeed = (Math.random()-0.5)*0.03;
+    this.alpha = Math.random()*0.45+0.2;
+    this.color = Math.random()>0.5 ? '#ffd700':'#d4af37';
+  }
+  update(){
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.rotate += this.rotateSpeed;
+  }
+  draw(){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.rotate);
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.ellipse(0,0,this.size, this.size*0.5,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+let scaleList = [];
+function animate(){
+  requestAnimationFrame(animate);
+  ctx.fillStyle = 'rgba(7,7,7,0.04)';
+  ctx.fillRect(0,0,w,h);
+  if(Math.random()<0.22){
+    scaleList.push(new ScaleParticle());
+  }
+  for(let i = scaleList.length-1; i>=0;i--){
+    let p = scaleList[i];
+    p.update();
+    p.draw();
+    if(p.y>h+20){
+      scaleList.splice(i,1);
+    }
+  }
+}
+animate();
+// ========== 音乐播放器：小圆点点击弹出/隐藏 + 自动播放 ==========
+const musicDot = document.querySelector('.music-dot');
+const musicPanel = document.querySelector('.music-panel');
+const bgAudio = document.getElementById('bgAudio');
+const musicToggle = document.getElementById('musicToggle');
+let isPlaying = false;
+// 点击小圆点：弹出面板并自动播放
+musicDot.addEventListener('click', () => {
+  musicPanel.classList.toggle('show');
+  if (!isPlaying) {
+    bgAudio.play().then(() => {
+      isPlaying = true;
+      musicToggle.textContent = '⏸';
+      musicToggle.classList.add('playing');
+    }).catch(err => {
+      console.log('播放失败：', err);
+    });
+  }
+});
+// 点击播放/暂停按钮
+musicToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isPlaying) {
+    bgAudio.pause();
+    musicToggle.textContent = '▶';
+    musicToggle.classList.remove('playing');
+  } else {
+    bgAudio.play().then(() => {
+      musicToggle.textContent = '⏸';
+      musicToggle.classList.add('playing');
+    });
+  }
+  isPlaying = !isPlaying;
+});
+</script>
+</body>
+</html>
