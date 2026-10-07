@@ -19,6 +19,7 @@ body{
   color:#fff;
   text-align:center;
   position:relative;
+  overflow-x:hidden;
 }
 #canvas{
   position:fixed;
@@ -85,9 +86,7 @@ h1{
   padding:26px 30px;
   box-shadow:0 0 24px rgba(218,165,32,0.14);
 }
-.content p{
-  margin-bottom:14px;
-}
+.content p{ margin-bottom:14px; }
 .sign{
   margin-top:20px;
   font-size:0.95rem;
@@ -113,106 +112,236 @@ h1{
   letter-spacing:1px;
   text-shadow:
     0 0 8px rgba(255,215,0,0.8),
-    0 0 16px rgba(255,215,0.5);
+    0 0 16px rgba(255,215,0,0.5);
   z-index:4;
 }
-/* ========== 音乐播放器：左下角小圆点 ========== */
-.music-wrap {
-  position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: 6;
+
+/* ================= 时间组件（右上角，按钮在左） ================= */
+.time-box{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:6;
+  background:rgba(12,12,12,0.75);
+  border:1px solid rgba(218,165,32,0.35);
+  border-radius:12px;
+  box-shadow:0 0 18px rgba(218,165,32,0.16);
+  display:flex;
+  align-items:stretch;
+  transform:translateX(calc(100% + 16px));
+  opacity:0;
+  transition:transform 0.7s ease-out, opacity 0.7s ease;
 }
-.music-dot {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(218, 165, 32, 0.65);
-  background: #111;
-  color: gold;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 14px rgba(218, 165, 32, 0.35);
-  transition: 0.25s;
+.time-box.show{ transform:translateX(0); opacity:1; }
+
+/* 收起按钮放左边 */
+.time-fold-btn{
+  width:24px;
+  flex:0 0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(218,165,32,0.75);
+  cursor:pointer;
+  border-right:1px solid rgba(218,165,32,0.25);
+  border-radius:12px 0 0 12px;
+  user-select:none;
 }
-.music-dot:hover {
-  box-shadow: 0 0 22px rgba(218, 165, 32, 0.6);
+
+.time-main{
+  width:196px;
+  padding:10px 14px;
+  text-align:right;
+  overflow:hidden;
+  transition:width 0.35s ease, padding 0.35s ease;
 }
-.music-panel {
-  position: absolute;
-  left: 0;
-  bottom: 54px;
-  width: 140px;
-  background: rgba(12, 12, 12, 0.88);
-  border: 1px solid rgba(218, 165, 32, 0.35);
-  border-radius: 10px;
-  padding: 12px;
-  box-shadow: 0 0 18px rgba(218, 165, 32, 0.18);
-  text-align: center;
-  display: none;
+.time-box.collapsed .time-main{
+  width:0;
+  padding:10px 0;
 }
-.music-panel.show {
-  display: block;
+.time-date{
+  font-size:0.8rem;
+  color:rgba(218,165,32,0.75);
+  letter-spacing:1px;
+  margin-bottom:4px;
+  white-space:nowrap;
 }
-.music-title {
-  color: gold;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+.time-clock{
+  font-size:1.3rem;
+  color:gold;
+  letter-spacing:2px;
+  white-space:nowrap;
+  text-shadow:0 0 10px rgba(255,215,0,0.6);
 }
-.music-toggle {
-  background: #1c1c1c;
-  color: #fff;
-  border: 1px solid rgba(218, 165, 32, 0.45);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin: 0 auto;
-  font-size: 16px;
+
+/* ================= 音乐播放器（左下角，按钮在右） ================= */
+.music-wrap{
+  position:fixed;
+  left:16px;
+  bottom:16px;
+  z-index:6;
+  background:rgba(12,12,12,0.75);
+  border:1px solid rgba(218,165,32,0.35);
+  border-radius:12px;
+  box-shadow:0 0 18px rgba(218,165,32,0.16);
+  display:flex;
+  align-items:stretch;
+  transform:translateX(calc(-100% - 24px));
+  opacity:0;
+  transition:transform 0.7s ease-out, opacity 0.7s ease;
 }
-.music-toggle:hover {
-  border-color: gold;
-  box-shadow: 0 0 8px rgba(218, 165, 32, 0.4);
+.music-wrap.show{ transform:translateX(0); opacity:1; }
+
+.music-main{
+  width:220px;
+  padding:12px 14px;
+  overflow:hidden;
+  transition:width 0.35s ease, padding 0.35s ease;
 }
-.music-toggle.playing {
-  color: gold;
+.music-wrap.collapsed .music-main{
+  width:0;
+  padding:12px 0;
 }
-audio {
-  display: none;
+
+/* 收起按钮放右边 */
+.music-fold-btn{
+  width:24px;
+  flex:0 0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(218,165,32,0.75);
+  cursor:pointer;
+  border-left:1px solid rgba(218,165,32,0.25);
+  border-radius:0 12px 12px 0;
+  user-select:none;
 }
+
+.music-title{
+  color:gold;
+  font-size:0.9rem;
+  margin-bottom:10px;
+  letter-spacing:1px;
+  text-align:left;
+  white-space:nowrap;
+}
+.music-row-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.music-toggle{
+  background:#1c1c1c;
+  color:#fff;
+  border:1px solid rgba(218,165,32,0.45);
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:14px;
+  flex-shrink:0;
+}
+.music-toggle:hover{
+  border-color:gold;
+  box-shadow:0 0 8px rgba(218,165,32,0.4);
+}
+.music-toggle.playing{ color:gold; }
+
+.progress-wrap{
+  width:100%;
+  height:6px;
+  background:#222;
+  border-radius:3px;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+}
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#d4af37,#ffd700);
+  border-radius:3px;
+  width:0%;
+}
+.progress-thumb{
+  position:absolute;
+  left:0;
+  top:50%;
+  width:12px;
+  height:12px;
+  background:gold;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 6px gold;
+}
+.time-text{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.72rem;
+  color:rgba(218,165,32,0.65);
+  margin-top:6px;
+}
+
+audio{ display:none; }
+
 @media(max-width:480px){
-  .badge{
-    width:156px;
-    height:156px;
-  }
-  .content{
-    padding:20px 22px;
-  }
-  .bottom-name{
-    right:12px;
-    bottom:12px;
-    font-size:0.85rem;
-  }
-  .music-wrap{
-    left:12px;
-    bottom:12px;
-  }
+  .badge{ width:156px; height:156px; }
+  .content{ padding:20px 22px; }
+  .bottom-name{ right:12px; bottom:12px; font-size:0.85rem; }
+
+  .time-box{ top:10px; right:10px; }
+  .time-main{ width:168px; padding:8px 12px; }
+  .time-clock{ font-size:1.05rem; }
+  .time-date{ font-size:0.72rem; }
+
+  .music-wrap{ left:10px; bottom:10px; }
+  .music-main{ width:180px; padding:10px 10px; }
 }
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
+
+<!-- 时间组件：按钮在左，内容在右 -->
+<div class="time-box" id="timeBox">
+  <div class="time-fold-btn" id="timeFoldBtn">◀</div>
+  <div class="time-main">
+    <div class="time-date" id="dateDom"></div>
+    <div class="time-clock" id="timeDom"></div>
+  </div>
+</div>
+
+<!-- 音乐播放器：内容在左，按钮在右 -->
+<div class="music-wrap" id="musicWrap">
+  <div class="music-main">
+    <div class="music-title">心似烟火</div>
+    <div class="music-row-top">
+      <button class="music-toggle" id="musicToggle">▶</button>
+    </div>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-thumb" id="progressThumb"></div>
+    </div>
+    <div class="time-text">
+      <span id="curTime">00:00</span>
+      <span id="durTime">00:00</span>
+    </div>
+  </div>
+  <div class="music-fold-btn" id="musicFoldBtn">▶</div>
+</div>
+
+<!-- 音频 -->
+<audio id="bgAudio" preload="metadata" loop>
+  <source src="xinshiyanhuo.mp3" type="audio/mpeg">
+</audio>
+
 <div class="wrap">
   <div class="dragon-line"></div>
   <div class="badge">
-    <img src="https://s41.ax1x.com/2026/10/06/pntkM8J.jpg">
+    <img src="https://s41.ax1x.com/2026/10/06/pntkM8J.jpg" alt="徽章">
   </div>
   <h1>生日蛋糕是青春的墓碑</h1>
   <div class="content">
@@ -221,45 +350,35 @@ audio {
     <p>纵然世间有龙影蛰伏，也愿你被温柔与好运庇护。</p>
     <p>不必活成别人的英雄，只做属于自己的光。</p>
     <p>前路浩荡，万事尽可期待。</p>
-    <p class="sign">
-      ——卡塞尔学院
-    </p>
+    <p class="sign">——卡塞尔学院</p>
   </div>
 </div>
-<!-- 音乐播放器：左下角小圆点 + 弹出小方块 -->
-<div class="music-wrap">
-  <div class="music-dot">♪</div>
-  <div class="music-panel">
-    <div class="music-title">心似烟火</div>
-    <button class="music-toggle" id="musicToggle">▶</button>
-  </div>
-  <audio id="bgAudio" preload="metadata" loop>
-    <source src="xinshiyanhuo.mp3" type="audio/mpeg">
-  
-</div>
+
 <div class="bottom-name">佟浩嘉</div>
+
 <script>
+/* ==================== 粒子背景 ==================== */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-let w,h;
+let w, h;
 function resize(){
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
 }
 resize();
-window.addEventListener('resize',resize);
-// 龙鳞飘落粒子
+window.addEventListener('resize', resize);
+
 class ScaleParticle{
   constructor(){
     this.x = Math.random() * w;
     this.y = -30;
     this.size = Math.random() * 4 + 1.5;
     this.speedY = Math.random() * 1.2 + 0.6;
-    this.speedX = (Math.random()-0.5)*0.6;
-    this.rotate = Math.random()*Math.PI*2;
-    this.rotateSpeed = (Math.random()-0.5)*0.03;
-    this.alpha = Math.random()*0.45+0.2;
-    this.color = Math.random()>0.5 ? '#ffd700':'#d4af37';
+    this.speedX = (Math.random() - 0.5) * 0.6;
+    this.rotate = Math.random() * Math.PI * 2;
+    this.rotateSpeed = (Math.random() - 0.5) * 0.03;
+    this.alpha = Math.random() * 0.45 + 0.2;
+    this.color = Math.random() > 0.5 ? '#ffd700' : '#d4af37';
   }
   update(){
     this.y += this.speedY;
@@ -268,68 +387,155 @@ class ScaleParticle{
   }
   draw(){
     ctx.save();
-    ctx.translate(this.x,this.y);
+    ctx.translate(this.x, this.y);
     ctx.rotate(this.rotate);
     ctx.globalAlpha = this.alpha;
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.ellipse(0,0,this.size, this.size*0.5,0,0,Math.PI*2);
+    ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 }
-let scaleList = [];
+
+const scaleList = [];
 function animate(){
   requestAnimationFrame(animate);
-  ctx.fillStyle = 'rgba(7,7,7,0.04)';
-  ctx.fillRect(0,0,w,h);
-  if(Math.random()<0.22){
-    scaleList.push(new ScaleParticle());
-  }
-  for(let i = scaleList.length-1; i>=0;i--){
-    let p = scaleList[i];
+  ctx.clearRect(0, 0, w, h);
+
+  if (Math.random() < 0.22) scaleList.push(new ScaleParticle());
+
+  for (let i = scaleList.length - 1; i >= 0; i--){
+    const p = scaleList[i];
     p.update();
     p.draw();
-    if(p.y>h+20){
-      scaleList.splice(i,1);
-    }
+    if (p.y > h + 20) scaleList.splice(i, 1);
   }
 }
 animate();
-// ========== 音乐播放器：小圆点点击弹出/隐藏 + 自动播放 ==========
-const musicDot = document.querySelector('.music-dot');
-const musicPanel = document.querySelector('.music-panel');
-const bgAudio = document.getElementById('bgAudio');
-const musicToggle = document.getElementById('musicToggle');
-let isPlaying = false;
-// 点击小圆点：弹出面板并自动播放
-musicDot.addEventListener('click', () => {
-  musicPanel.classList.toggle('show');
-  if (!isPlaying) {
-    bgAudio.play().then(() => {
-      isPlaying = true;
-      musicToggle.textContent = '⏸';
-      musicToggle.classList.add('playing');
-    }).catch(err => {
-      console.log('播放失败：', err);
-    });
-  }
+
+/* ==================== 时间组件 ==================== */
+const dateDom = document.getElementById('dateDom');
+const timeDom = document.getElementById('timeDom');
+const timeBox = document.getElementById('timeBox');
+const timeFoldBtn = document.getElementById('timeFoldBtn');
+
+function padZero(n){
+  return n.toString().padStart(2, '0');
+}
+function updateDateTime(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = padZero(now.getMonth() + 1);
+  const d = padZero(now.getDate());
+  const weekArr = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  const week = weekArr[now.getDay()];
+  dateDom.innerText = `${y}年${m}月${d}日 ${week}`;
+  timeDom.innerText = `${padZero(now.getHours())}:${padZero(now.getMinutes())}:${padZero(now.getSeconds())}`;
+}
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+setTimeout(() => timeBox.classList.add('show'), 2000);
+
+/* 按钮在左：展开时 ◀（向左收起），收起后 ▶（向右展开） */
+timeFoldBtn.addEventListener('click', () => {
+  timeBox.classList.toggle('collapsed');
+  timeFoldBtn.textContent = timeBox.classList.contains('collapsed') ? '▶' : '◀';
 });
-// 点击播放/暂停按钮
-musicToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  if (isPlaying) {
-    bgAudio.pause();
-    musicToggle.textContent = '▶';
-    musicToggle.classList.remove('playing');
+
+/* ==================== 音乐播放器 ==================== */
+const musicWrap    = document.getElementById('musicWrap');
+const bgAudio      = document.getElementById('bgAudio');
+const musicToggle  = document.getElementById('musicToggle');
+const musicFoldBtn = document.getElementById('musicFoldBtn');
+const progressWrap = document.getElementById('progressWrap');
+const progressBar  = document.getElementById('progressBar');
+const progressThumb= document.getElementById('progressThumb');
+const curTimeDom   = document.getElementById('curTime');
+const durTimeDom   = document.getElementById('durTime');
+
+let isDragging = false;
+
+setTimeout(() => musicWrap.classList.add('show'), 1500);
+
+/* 按钮在右：展开时 ▶（向右收起），收起后 ◀（向左展开） */
+musicFoldBtn.addEventListener('click', () => {
+  musicWrap.classList.toggle('collapsed');
+  musicFoldBtn.textContent = musicWrap.classList.contains('collapsed') ? '◀' : '▶';
+});
+
+function formatSec(s){
+  if (!isFinite(s) || s < 0) s = 0;
+  return padZero(Math.floor(s / 60)) + ':' + padZero(Math.floor(s % 60));
+}
+
+bgAudio.addEventListener('play', () => {
+  musicToggle.textContent = '⏸';
+  musicToggle.classList.add('playing');
+});
+bgAudio.addEventListener('pause', () => {
+  musicToggle.textContent = '▶';
+  musicToggle.classList.remove('playing');
+});
+
+musicToggle.addEventListener('click', () => {
+  if (bgAudio.paused) {
+    bgAudio.play().catch(err => console.warn('播放失败，请检查 xinshiyanhuo.mp3：', err));
   } else {
-    bgAudio.play().then(() => {
-      musicToggle.textContent = '⏸';
-      musicToggle.classList.add('playing');
-    });
+    bgAudio.pause();
   }
-  isPlaying = !isPlaying;
 });
+
+function refreshDuration(){
+  if (isFinite(bgAudio.duration)) durTimeDom.innerText = formatSec(bgAudio.duration);
+}
+bgAudio.addEventListener('loadedmetadata', refreshDuration);
+bgAudio.addEventListener('durationchange', refreshDuration);
+
+bgAudio.addEventListener('timeupdate', () => {
+  if (isDragging) return;
+  const dur = bgAudio.duration;
+  if (!isFinite(dur) || dur <= 0) return;
+  const pct = bgAudio.currentTime / dur;
+  progressBar.style.width = (pct * 100) + '%';
+  progressThumb.style.left = (pct * 100) + '%';
+  curTimeDom.innerText = formatSec(bgAudio.currentTime);
+});
+
+function setProgressByX(clientX){
+  const rect = progressWrap.getBoundingClientRect();
+  let percent = (clientX - rect.left) / rect.width;
+  percent = Math.max(0, Math.min(1, percent));
+  progressBar.style.width = (percent * 100) + '%';
+  progressThumb.style.left = (percent * 100) + '%';
+  const dur = bgAudio.duration;
+  if (isFinite(dur) && dur > 0) {
+    bgAudio.currentTime = percent * dur;
+    curTimeDom.innerText = formatSec(bgAudio.currentTime);
+  }
+}
+
+progressWrap.addEventListener('mousedown', e => {
+  e.preventDefault();
+  isDragging = true;
+  setProgressByX(e.clientX);
+});
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  setProgressByX(e.clientX);
+});
+document.addEventListener('mouseup', () => { isDragging = false; });
+
+progressWrap.addEventListener('touchstart', e => {
+  isDragging = true;
+  setProgressByX(e.touches[0].clientX);
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (!isDragging) return;
+  setProgressByX(e.touches[0].clientX);
+}, { passive: true });
+document.addEventListener('touchend', () => { isDragging = false; });
 </script>
 </body>
 </html>
