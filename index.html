@@ -177,11 +177,12 @@ h1{
   100% { opacity:0; transform: translateX(-50%) translateY(-6px) scale(0.98); }
 }
 
-/* ================= 时间组件 ================= */
+/* ================= 时间组件（左下，音乐上方，等宽，贴紧） ================= */
 .time-box{
   position:fixed;
-  top: calc(16px + env(safe-area-inset-top, 0px));
-  right: calc(16px + env(safe-area-inset-right, 0px));
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  /* 贴紧音乐：音乐高度约 89px + 间距 8px = 105px */
+  bottom: calc(118px + env(safe-area-inset-bottom, 0px));
   z-index:6;
   background:rgba(12,12,12,0.75);
   border:1px solid var(--gold-border);
@@ -189,11 +190,25 @@ h1{
   box-shadow:0 0 18px var(--gold-faint);
   display:flex;
   align-items:stretch;
-  transform:translateX(calc(100% + 16px));
-  opacity:0;
-  transition:transform 0.7s ease-out, opacity 0.7s ease;
+  transform: translateX(calc(-100% - 24px));
+  opacity: 0;
+  transition: transform 0.7s ease-out, opacity 0.7s ease;
 }
-.time-box.show{ transform:translateX(0); opacity:1; }
+.time-box.show{ transform: translateX(0); opacity: 1; }
+
+/* 内容区宽度与音乐一致（220px），保证整体等宽 */
+.time-main{
+  width:220px;
+  padding:10px 14px;
+  text-align:left;
+  overflow:hidden;
+  transition: width 0.35s ease, padding 0.35s ease;
+}
+.time-box.collapsed .time-main{
+  width:0;
+  padding:10px 0;
+}
+
 .time-fold-btn{
   width:24px;
   flex:0 0 24px;
@@ -202,21 +217,11 @@ h1{
   justify-content:center;
   color:var(--gold-soft);
   cursor:pointer;
-  border-right:1px solid rgba(218,165,32,0.25);
-  border-radius:12px 0 0 12px;
+  border-left:1px solid rgba(218,165,32,0.25);
+  border-radius:0 12px 12px 0;
   user-select:none;
 }
-.time-main{
-  width:196px;
-  padding:10px 14px;
-  text-align:right;
-  overflow:hidden;
-  transition:width 0.35s ease, padding 0.35s ease;
-}
-.time-box.collapsed .time-main{
-  width:0;
-  padding:10px 0;
-}
+
 .time-date{
   font-size:0.8rem;
   color:var(--gold-soft);
@@ -232,7 +237,7 @@ h1{
   text-shadow:0 0 10px rgba(255,215,0,0.6);
 }
 
-/* ================= 音乐播放器 ================= */
+/* ================= 音乐播放器（左下，等宽） ================= */
 .music-wrap{
   position:fixed;
   left: calc(16px + env(safe-area-inset-left, 0px));
@@ -250,7 +255,7 @@ h1{
 }
 .music-wrap.show{ transform:translateX(0); opacity:1; }
 .music-main{
-  width:220px;
+  width:220px;                    /* 与 time-main 等宽 */
   padding:8px 14px;
   overflow:hidden;
   transition:width 0.35s ease, padding 0.35s ease;
@@ -348,11 +353,12 @@ audio{ display:none; }
     font-size:0.85rem;
   }
 
+  /* 时间：左下，音乐上方，等宽 180px */
   .time-box{
-    top: calc(10px + env(safe-area-inset-top, 0px));
-    right: calc(10px + env(safe-area-inset-right, 0px));
+    left: calc(10px + env(safe-area-inset-left, 0px));
+    bottom: calc(112px + env(safe-area-inset-bottom, 0px));
   }
-  .time-main{ width:168px; padding:8px 12px; }
+  .time-main{ width:180px; padding:8px 12px; }
   .time-clock{ font-size:1.05rem; }
   .time-date{ font-size:0.72rem; }
 
@@ -376,16 +382,16 @@ audio{ display:none; }
 <!-- 底部小提示 -->
 <div class="toast" id="toast">🎁 有彩蛋，你找找</div>
 
-<!-- 时间组件 -->
+<!-- 时间组件（左下，音乐上方，按钮在右） -->
 <div class="time-box" id="timeBox">
-  <div class="time-fold-btn" id="timeFoldBtn">◀</div>
   <div class="time-main">
     <div class="time-date" id="dateDom"></div>
     <div class="time-clock" id="timeDom"></div>
   </div>
+  <div class="time-fold-btn" id="timeFoldBtn">▶</div>
 </div>
 
-<!-- 音乐播放器 -->
+<!-- 音乐播放器（左下） -->
 <div class="music-wrap" id="musicWrap">
   <div class="music-main">
     <div class="music-title">心似烟火</div>
@@ -443,7 +449,6 @@ function resize(){
 resize();
 window.addEventListener('resize', resize);
 
-/* ---------- 背景：飘落的龙鳞 ---------- */
 class ScaleParticle{
   constructor(){
     this.x = Math.random() * w;
@@ -474,7 +479,6 @@ class ScaleParticle{
   }
 }
 
-/* ---------- 拖尾：金色光带（连接两点的渐变线） ---------- */
 class LightStreak{
   constructor(x1, y1, x2, y2){
     this.x1 = x1; this.y1 = y1;
@@ -482,33 +486,25 @@ class LightStreak{
     this.life = 1;
     this.width = 10 + Math.random() * 8;
   }
-  update(){
-    this.life -= 0.045;
-  }
+  update(){ this.life -= 0.045; }
   draw(){
     if (this.life <= 0) return;
     ctx.save();
     ctx.globalAlpha = this.life;
     ctx.lineCap = 'round';
-
-    // 外层柔光
     ctx.shadowColor = 'rgba(255, 180, 0, 1)';
     ctx.shadowBlur = 26;
-
     const grad = ctx.createLinearGradient(this.x1, this.y1, this.x2, this.y2);
     grad.addColorStop(0,   'rgba(184, 134, 11, 0)');
     grad.addColorStop(0.35,'rgba(218, 165, 32, ' + (this.life * 0.9) + ')');
     grad.addColorStop(0.6, 'rgba(255, 165, 0, ' + (this.life * 0.95) + ')');
     grad.addColorStop(1,   'rgba(255, 215, 0, 0)');
-
     ctx.strokeStyle = grad;
     ctx.lineWidth = this.width * this.life;
     ctx.beginPath();
     ctx.moveTo(this.x1, this.y1);
     ctx.lineTo(this.x2, this.y2);
     ctx.stroke();
-
-    // 内芯亮线
     ctx.shadowBlur = 8;
     ctx.strokeStyle = 'rgba(255, 240, 160, ' + (this.life * 0.85) + ')';
     ctx.lineWidth = Math.max(1, this.width * this.life * 0.28);
@@ -516,12 +512,10 @@ class LightStreak{
     ctx.moveTo(this.x1, this.y1);
     ctx.lineTo(this.x2, this.y2);
     ctx.stroke();
-
     ctx.restore();
   }
 }
 
-/* ---------- 拖尾：金鳞碎片 ---------- */
 class TrailScale{
   constructor(x, y, burst){
     const angle = Math.random() * Math.PI * 2;
@@ -534,7 +528,6 @@ class TrailScale{
     this.scaleY = 0.5 + Math.random() * 0.35;
     this.alpha = 1;
     this.decay = burst ? (0.010 + Math.random() * 0.012) : (0.014 + Math.random() * 0.016);
-    // 深金色系，从暗金到亮金
     const colors = ['#FFD700', '#FFB90F', '#FFA500', '#DAA520', '#B8860B'];
     this.color = colors[Math.floor(Math.random() * colors.length)];
     this.rotate = Math.random() * Math.PI * 2;
@@ -545,7 +538,6 @@ class TrailScale{
     this.y += this.vy;
     this.vx *= 0.94;
     this.vy *= 0.94;
-    // 轻微重力，落下来的感觉
     this.vy += 0.035;
     this.alpha -= this.decay;
     this.size *= 0.985;
@@ -556,8 +548,6 @@ class TrailScale{
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotate);
-
-    // 外发光
     ctx.shadowColor = this.color;
     ctx.shadowBlur = 22;
     ctx.globalAlpha = Math.max(0, this.alpha * 0.65);
@@ -565,15 +555,11 @@ class TrailScale{
     ctx.beginPath();
     ctx.ellipse(0, 0, this.size * 1.5, this.size * this.scaleY * 1.5, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    // 主体鳞片
     ctx.globalAlpha = Math.max(0, this.alpha);
     ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.ellipse(0, 0, this.size, this.size * this.scaleY, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    // 内层高光（让它像有厚度的鳞片，不是单纯光点）
     ctx.shadowBlur = 0;
     ctx.globalAlpha = Math.max(0, this.alpha * 0.9);
     ctx.fillStyle = 'rgba(255, 240, 180, 0.95)';
@@ -582,7 +568,6 @@ class TrailScale{
                 this.size * 0.42, this.size * this.scaleY * 0.38,
                 0, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.restore();
   }
 }
@@ -595,7 +580,6 @@ function animate(){
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, w, h);
 
-  // 背景龙鳞
   if (Math.random() < spawnRate) scaleList.push(new ScaleParticle());
   for (let i = scaleList.length - 1; i >= 0; i--){
     const p = scaleList[i];
@@ -604,7 +588,6 @@ function animate(){
     if (p.y > h + 20) scaleList.splice(i, 1);
   }
 
-  // 光带
   for (let i = streakList.length - 1; i >= 0; i--){
     const s = streakList[i];
     s.update();
@@ -612,7 +595,6 @@ function animate(){
     if (s.life <= 0) streakList.splice(i, 1);
   }
 
-  // 金鳞
   for (let i = trailList.length - 1; i >= 0; i--){
     const p = trailList[i];
     p.update();
@@ -622,47 +604,39 @@ function animate(){
 }
 animate();
 
-/* ---------- 生成拖尾：光带 + 金鳞 ---------- */
 let lastX = -999, lastY = -999;
 
 function spawnTrail(x, y, isBurst){
   if (!isBurst && lastX > -900){
-    // 光带：从上一位置连到当前位置
     streakList.push(new LightStreak(lastX, lastY, x, y));
     if (streakList.length > 60){
       streakList.splice(0, streakList.length - 60);
     }
   }
-
-  // 金鳞：滑动 2~3 片，爆裂 14 片
   const n = isBurst ? 14 : (isMobile ? 2 : 3);
   for (let i = 0; i < n; i++){
     trailList.push(new TrailScale(x, y, isBurst));
   }
-
   if (trailList.length > 380){
     trailList.splice(0, trailList.length - 380);
   }
 }
 
-/* 鼠标移动 */
 window.addEventListener('mousemove', (e) => {
   const dx = e.clientX - lastX;
   const dy = e.clientY - lastY;
-  if (dx * dx + dy * dy < 12) return;   // 约 3.5px
+  if (dx * dx + dy * dy < 12) return;
   spawnTrail(e.clientX, e.clientY, false);
   lastX = e.clientX;
   lastY = e.clientY;
 });
 
-/* 鼠标按下爆裂 */
 window.addEventListener('mousedown', (e) => {
   lastX = e.clientX;
   lastY = e.clientY;
   spawnTrail(e.clientX, e.clientY, true);
 });
 
-/* 手指划动 */
 window.addEventListener('touchmove', (e) => {
   const t = e.touches[0];
   if (!t) return;
@@ -674,7 +648,6 @@ window.addEventListener('touchmove', (e) => {
   lastY = t.clientY;
 }, { passive: true });
 
-/* 手指按下爆裂 */
 window.addEventListener('touchstart', (e) => {
   const t = e.touches[0];
   if (!t) return;
@@ -723,11 +696,9 @@ function updateDateTime(){
 updateDateTime();
 setInterval(updateDateTime, 1000);
 
-setTimeout(() => timeBox.classList.add('show'), 2000);
-
 timeFoldBtn.addEventListener('click', () => {
   timeBox.classList.toggle('collapsed');
-  timeFoldBtn.textContent = timeBox.classList.contains('collapsed') ? '▶' : '◀';
+  timeFoldBtn.textContent = timeBox.classList.contains('collapsed') ? '◀' : '▶';
 });
 
 /* ==================== 音乐播放器 ==================== */
@@ -746,7 +717,9 @@ let hasInteracted = false;
 let audioStarted = false;
 const TARGET_VOLUME = 0.5;
 
-setTimeout(() => musicWrap.classList.add('show'), 1500);
+/* ★ 出现顺序调换：时间先（1.5s），音乐后（2s） */
+setTimeout(() => timeBox.classList.add('show'), 1500);
+setTimeout(() => musicWrap.classList.add('show'), 2000);
 
 bgAudio.addEventListener('error', (e) => {
   console.error('❌ 音频加载失败，请检查 xinshiyanhuo.mp3 是否与 HTML 在同一目录下：', e);
