@@ -123,7 +123,18 @@ h1{
     0 0 8px rgba(255,215,0,0.8),
     0 0 16px rgba(255,215,0,0.5);
   z-index:4;
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+  transition: text-shadow 0.3s ease, color 0.3s ease;
   animation: fadeIn 1s cubic-bezier(0.85, 0, 0.9, 0.05) 2.4s both;
+}
+.bottom-name:hover{
+  color:#fff6c9;
+  text-shadow:
+    0 0 10px rgba(255,215,0,1),
+    0 0 22px rgba(255,215,0,0.75),
+    0 0 34px rgba(255,215,0,0.45);
 }
 
 @keyframes fadeUp{
@@ -137,6 +148,33 @@ h1{
 @keyframes fadeIn{
   from{ opacity:0; }
   to{ opacity:1; }
+}
+
+/* ================= 底部小提示 ================= */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%) translateY(14px) scale(0.95);
+  z-index:20;
+  background: rgba(12,12,12,0.88);
+  border:1px solid rgba(218,165,32,0.55);
+  border-radius:999px;
+  padding:10px 22px;
+  color:gold;
+  font-size:0.95rem;
+  letter-spacing:1px;
+  white-space:nowrap;
+  box-shadow: 0 0 22px rgba(218,165,32,0.35);
+  opacity:0;
+  pointer-events:none;
+  animation: toastPop 1.8s ease 0.5s both;
+}
+@keyframes toastPop{
+  0%   { opacity:0; transform: translateX(-50%) translateY(14px) scale(0.95); }
+  18%  { opacity:1; transform: translateX(-50%) translateY(0)   scale(1); }
+  75%  { opacity:1; transform: translateX(-50%) translateY(0)   scale(1); }
+  100% { opacity:0; transform: translateX(-50%) translateY(-6px) scale(0.98); }
 }
 
 /* ================= 时间组件 ================= */
@@ -323,11 +361,20 @@ audio{ display:none; }
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
   .music-main{ width:180px; padding:7px 10px; }
+
+  .toast{
+    bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+    font-size:0.88rem;
+    padding:9px 18px;
+  }
 }
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
+
+<!-- 底部小提示 -->
+<div class="toast" id="toast">🎁 有彩蛋，你找找</div>
 
 <!-- 时间组件 -->
 <div class="time-box" id="timeBox">
@@ -378,7 +425,7 @@ audio{ display:none; }
   </div>
 </div>
 
-<div class="bottom-name">佟浩嘉</div>
+<div class="bottom-name" id="bottomName" title="点一下试试？">佟浩嘉</div>
 
 <script>
 /* ==================== 粒子背景 ==================== */
@@ -458,6 +505,11 @@ animate();
   });
 })();
 
+/* ==================== 彩蛋入口 ==================== */
+document.getElementById('bottomName').addEventListener('click', () => {
+  location.href = 'caidan.html';
+});
+
 /* ==================== 时间组件 ==================== */
 const dateDom = document.getElementById('dateDom');
 const timeDom = document.getElementById('timeDom');
@@ -494,13 +546,12 @@ const curTimeDom   = document.getElementById('curTime');
 const durTimeDom   = document.getElementById('durTime');
 
 let isDragging = false;
-let hasInteracted = false;  // 是否已用掉自动播放机会
-let audioStarted = false;   // 音频是否成功播放过
+let hasInteracted = false;
+let audioStarted = false;
 const TARGET_VOLUME = 0.5;
 
 setTimeout(() => musicWrap.classList.add('show'), 1500);
 
-/* 排查：如果音频加载失败，控制台会明确提示 */
 bgAudio.addEventListener('error', (e) => {
   console.error('❌ 音频加载失败，请检查 xinshiyanhuo.mp3 是否与 HTML 在同一目录下：', e);
 });
@@ -527,41 +578,17 @@ bgAudio.addEventListener('pause', () => {
   musicToggle.classList.remove('playing');
 });
 
-/* 首次「触摸结束」或「点击」时尝试播放一次
-   注意：不能用 touchstart，iOS/部分安卓会拒绝在 touchstart 里播放 */
 function startAudioOnce(){
   if (hasInteracted) return;
   hasInteracted = true;
 
-  // 立刻移除全局监听，无论成功失败都不再自动尝试
   document.removeEventListener('click', onAnyClick);
   document.removeEventListener('touchend', onAnyTouch);
 
-  console.log('▶ 尝试自动播放音乐…');
   bgAudio.volume = 0;
-
   const playPromise = bgAudio.play();
 
-  if (playPromise && playPromise.then){
-    playPromise.then(() => {
-      audioStarted = true;
-      console.log('✅ 自动播放成功');
-      let v = 0;
-      const fadeIn = setInterval(() => {
-        v += 0.025;
-        if (v >= TARGET_VOLUME){
-          v = TARGET_VOLUME;
-          clearInterval(fadeIn);
-        }
-        bgAudio.volume = v;
-      }, 60);
-    }).catch(err => {
-      console.warn('❌ 自动播放被浏览器拦截，请手动点击播放按钮：', err);
-      // 不重置 hasInteracted，后续必须手动点击按钮
-    });
-  } else {
-    // 极老浏览器：无 promise
-    audioStarted = true;
+  const fadeInVolume = () => {
     let v = 0;
     const fadeIn = setInterval(() => {
       v += 0.025;
@@ -571,19 +598,28 @@ function startAudioOnce(){
       }
       bgAudio.volume = v;
     }, 60);
+  };
+
+  if (playPromise && playPromise.then){
+    playPromise.then(() => {
+      audioStarted = true;
+      fadeInVolume();
+    }).catch(err => {
+      console.warn('自动播放被浏览器拦截，请手动点击播放按钮：', err);
+    });
+  } else {
+    audioStarted = true;
+    fadeInVolume();
   }
 }
 
 function onAnyClick(){ startAudioOnce(); }
 function onAnyTouch(){ startAudioOnce(); }
 
-// 使用 touchend 代替 touchstart，避免 iOS 拒绝播放
 document.addEventListener('click', onAnyClick);
 document.addEventListener('touchend', onAnyTouch);
 
-/* 手动播放按钮 */
 musicToggle.addEventListener('click', (e) => {
-  // 防止冒泡到 document 又触发一次 startAudioOnce
   e.stopPropagation();
 
   if (bgAudio.paused){
