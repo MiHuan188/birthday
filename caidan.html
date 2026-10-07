@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>💗 写给你</title>
+<style>
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root{
+  --pink-1: #fff9fc;
+  --pink-2: #ffeaf3;
+  --pink-3: #ffd6e7;
+  --pink-4: #ffb3d1;
+  --pink-5: #ff85b3;
+  --pink-6: #ff5c8f;
+  --pink-7: #ff2e6a;
+  --pink-deep: #e91e63;
+  --gold: #ffd700;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html, body{ height:100%; }
+
+html{
+  scroll-padding-top: 60px;
+}
+
+body{
+  min-height:100dvh;
+  overflow-x:hidden;
+  overflow-y:auto;
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255, 200, 225, 0.65) 0%, transparent 42%),
+    radial-gradient(circle at 85% 78%, rgba(255, 175, 212, 0.55) 0%, transparent 46%),
+    radial-gradient(circle at 50% 50%, rgba(255, 225, 238, 0.45) 0%, transparent 60%),
+    linear-gradient(160deg, #fff9fc 0%, #ffeef6 35%, #ffdcea 70%, #ffc8de 100%);
+  background-attachment: fixed;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  padding: 60px 20px 40px;
+}
+
+/* ================= 光晕层 ================= */
+.aura{
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: auraBreathe 9s ease-in-out infinite;
+}
+.aura-1{ width: 420px; height: 420px; background: rgba(255, 150, 195, 0.55); top: -120px; left: -120px; }
+.aura-2{ width: 380px; height: 380px; background: rgba(255, 180, 215, 0.5); bottom: -140px; right: -140px; animation-delay: -2.5s; }
+.aura-3{ width: 300px; height: 300px; background: rgba(255, 200, 225, 0.45); top: 50%; right: -120px; transform: translateY(-50%); animation-delay: -5s; }
+.aura-4{ width: 340px; height: 340px; background: rgba(255, 170, 205, 0.45); bottom: 15%; left: -140px; animation-delay: -7s; }
+
+@keyframes auraBreathe{
+  0%, 100%{ transform: scale(1); opacity: 0.7; }
+  50%{ transform: scale(1.18); opacity: 1; }
+}
+
+/* ================= Canvas 粒子层 ================= */
+#scene{
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ================= 卡片 ================= */
+.content{
+  position: relative;
+  z-index: 3;
+  animation: cardIn 1.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
+}
+
+@keyframes cardIn{
+  from{ opacity: 0; transform: translateY(48px) scale(0.92); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card{
+  position: relative;
+  width: min(420px, 90vw);
+  padding: 46px 34px 28px;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 240, 247, 0.82) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 24px 70px rgba(255, 90, 140, 0.25),
+    0 8px 24px rgba(255, 140, 180, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+    0 0 90px rgba(255, 150, 195, 0.28);
+  text-align: center;
+  isolation: isolate;
+}
+
+.card::before{
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 33px;
+  padding: 3px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg,
+    rgba(255, 107, 157, 0.9) 60deg,
+    rgba(255, 182, 213, 0.95) 120deg,
+    transparent 180deg,
+    rgba(255, 107, 157, 0.9) 240deg,
+    rgba(255, 182, 213, 0.95) 300deg,
+    transparent 360deg
+  );
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+  animation: borderFlow 8s linear infinite;
+}
+
+@keyframes borderFlow{
+  to { --angle: 360deg; }
+}
+
+/* ================= 卡片内容 ================= */
+.top-ornament{
+  font-size: 0.9rem;
+  letter-spacing: 8px;
+  color: var(--pink-5);
+  opacity: 0.7;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(255, 133, 179, 0.5);
+}
+
+.title{
+  font-family: "Songti SC", "SimSun", "Noto Serif SC", serif;
+  font-size: clamp(1.8rem, 7vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: 8px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, #ff85b3 0%, #ff2e6a 50%, #ff85b3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(255, 107, 157, 0.35));
+}
+
+.divider{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.divider .line{
+  display: inline-block;
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pink-4), transparent);
+}
+.divider .heart-icon{
+  color: var(--pink-6);
+  font-size: 0.85rem;
+  animation: heartBeat 1.6s ease-in-out infinite;
+}
+
+@keyframes heartBeat{
+  0%, 100%{ transform: scale(1); }
+  50%{ transform: scale(1.25); }
+}
+
+/* ================= 原始文案 ================= */
+.message{
+  position: relative;
+  font-size: clamp(0.98rem, 3.8vw, 1.1rem);
+  line-height: 2.1;
+  color: #7a3a55;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.message p{
+  opacity: 0;
+  animation: lineIn 0.9s ease both;
+}
+.message p:nth-child(1){ animation-delay: 1.2s; }
+.message p:nth-child(2){ animation-delay: 1.5s; }
+.message p:nth-child(3){ animation-delay: 1.8s; }
+.message p:nth-child(4){ animation-delay: 2.1s; }
+.message p:nth-child(5){ animation-delay: 2.4s; }
+.message p:nth-child(6){ animation-delay: 2.7s; }
+.message .gap{ height: 8px; }
+
+.message.wiping,
+.surprise.wiping{
+  animation: wipeOut 0.85s cubic-bezier(0.55, 0.05, 0.75, 0.4) forwards;
+}
+@keyframes wipeOut{
+  0%   { clip-path: inset(0 0 0 0);      opacity: 1; filter: blur(0); }
+  100% { clip-path: inset(0 100% 0 0);   opacity: 0.15; filter: blur(4px); }
+}
+
+@keyframes lineIn{
+  from{ opacity: 0; transform: translateY(12px); filter: blur(4px); }
+  to{ opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ================= 惊喜区域 ================= */
+.surprise{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 6px 0 4px;
+}
+.surprise.show{
+  display: flex;
+}
+
+.surprise-text{
+  font-size: clamp(1.5rem, 6.2vw, 2.05rem);
+  font-weight: 800;
+  color: var(--pink-7);
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 12px rgba(255, 92, 143, 0.6),
+    0 0 28px rgba(255, 92, 143, 0.35);
+  opacity: 0;
+  animation: textPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+@keyframes textPop{
+  0%   { opacity: 0; transform: scale(0.4) rotate(-6deg); }
+  60%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* 惊喜 gif：用 box-shadow，避免 gif 每帧重算 drop-shadow 造成边缘闪烁 */
+.surprise-gif{
+  max-width: min(280px, 66vw);
+  max-height: 46vh;
+  display: block;
+  opacity: 0;
+  transform: scale(0);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(255, 92, 143, 0.4);
+  animation: bounceThree 2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s both;
+}
+
+@keyframes bounceThree{
+  0%   { transform: scale(0);     opacity: 0; }
+  8%   { transform: scale(0.45);  opacity: 1; }
+  20%  { transform: scale(1.25);  }
+  34%  { transform: scale(0.82);  }
+  48%  { transform: scale(1.18);  }
+  62%  { transform: scale(0.88);  }
+  76%  { transform: scale(1.10);  }
+  90%  { transform: scale(0.95);  }
+  100% { transform: scale(1);     opacity: 1; }
+}
+
+/* ================= 最终章 ================= */
+.finale{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0 0;
+  width: 100%;
+}
+.finale.show{
+  display: flex;
+}
+
+.finale-text{
+  width: 100%;
+  font-size: clamp(0.92rem, 3.6vw, 1.02rem);
+  line-height: 2;
+  color: #7a3a55;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+.finale-text p{
+  opacity: 0;
+  margin-bottom: 4px;
+}
+.finale-text p.show-line{
+  animation: lineIn 0.95s ease both;
+}
+
+/* ============ 粉色大时间 ============ */
+.finale-time{
+  position: relative;
+  margin-top: 26px;
+  font-family: "DIN Alternate", "Bebas Neue", system-ui, sans-serif;
+  font-size: clamp(1.7rem, 7.5vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: 4px;
+  background: linear-gradient(
+    115deg,
+    #ff85b3 0%,
+    #ff2e6a 22%,
+    #ffffff 42%,
+    #ff2e6a 58%,
+    #ff85b3 100%
+  );
+  background-size: 280% 100%;
+  background-position: 200% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 92, 143, 0.9))
+    drop-shadow(0 0 18px rgba(255, 92, 143, 0.6))
+    drop-shadow(0 0 36px rgba(255, 92, 143, 0.35));
+  opacity: 0;
+}
+
+.finale-time::before{
+  content: "";
+  position: absolute;
+  inset: -22px -34px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 92, 143, 0.5) 0%,
+    rgba(255, 92, 143, 0.18) 42%,
+    transparent 72%
+  );
+  filter: blur(22px);
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+  animation: timeGlow 2.6s ease-in-out infinite;
+}
+
+.finale-time.show-time{
+  animation:
+    timeIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    timeFlow 3.4s linear 1.2s infinite;
+}
+.finale-time.show-time::before{
+  opacity: 1;
+}
+
+@keyframes timeIn{
+  0%   { opacity: 0; transform: translateY(18px) scale(0.85); }
+  60%  { transform: translateY(-4px) scale(1.06); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes timeFlow{
+  0%   { background-position: 200% 50%; }
+  100% { background-position: -80% 50%; }
+}
+@keyframes timeGlow{
+  0%, 100%{ opacity: 0.4; transform: scale(1); }
+  50%     { opacity: 0.75; transform: scale(1.05); }
+}
+
+/* maimeng.gif：把 drop-shadow 换成 box-shadow，避免 gif 每帧闪烁 */
+.finale-gif-wrap{
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+.finale-gif-wrap.show-gif{
+  animation: gifIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.finale-gif{
+  max-width: min(240px, 62vw);
+  max-height: 42vh;
+  display: block;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(255, 92, 143, 0.4);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.finale-gif:hover{
+  box-shadow: 0 14px 32px rgba(255, 92, 143, 0.62);
+  transform: scale(1.03);
+}
+.finale-gif:active{
+  transform: scale(0.96);
+}
+@keyframes gifIn{
+  from{ opacity: 0; transform: translateY(24px) scale(0.85); }
+  60% { transform: translateY(-4px) scale(1.04); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ================= 点击塔菲提示 ================= */
+.tap-hint{
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: rgba(255, 92, 143, 0.85);
+  letter-spacing: 1.5px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(255, 133, 179, 0.5);
+}
+.tap-hint.show{
+  animation:
+    hintIn 0.9s ease both,
+    hintPulse 2s ease-in-out 1s infinite;
+}
+@keyframes hintIn{
+  from{ opacity: 0; transform: translateY(8px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+@keyframes hintPulse{
+  0%, 100%{ opacity: 0.7; }
+  50%     { opacity: 1; }
+}
+
+/* ================= 点击塔菲时飞散的小爱心 ================= */
+.pop-heart{
+  position: fixed;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  user-select: none;
+  filter: drop-shadow(0 0 8px rgba(255, 133, 179, 0.8));
+  animation: popHeart 1.2s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+@keyframes popHeart{
+  0%{
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+  }
+  20%{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15) rotate(0deg);
+  }
+  100%{
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+      scale(0.85) rotate(var(--rot));
+  }
+}
+
+/* ================= 漂浮小心形 ================= */
+.floating-heart{
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  user-select: none;
+  animation: floatAround 6s ease-in-out infinite, heartFade 1.5s ease both;
+  filter: drop-shadow(0 0 8px rgba(255, 133, 179, 0.55));
+}
+
+@keyframes floatAround{
+  0%, 100%{ transform: translate(0, 0) rotate(-6deg); }
+  25%{ transform: translate(12px, -18px) rotate(8deg); }
+  50%{ transform: translate(-10px, -30px) rotate(-4deg); }
+  75%{ transform: translate(-14px, -10px) rotate(6deg); }
+}
+@keyframes heartFade{
+  from{ opacity: 0; transform: scale(0.6); }
+  to{ opacity: 0.85; transform: scale(1); }
+}
+
+/* ================= 返回按钮 ================= */
+.back{
+  position: fixed;
+  left: calc(18px + env(safe-area-inset-left, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  font-size: 0.82rem;
+  color: rgba(255, 92, 143, 0.85);
+  text-decoration: none;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 133, 179, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(255, 133, 179, 0.18);
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: lineIn 0.8s ease 1.2s both;
+}
+.back:hover{
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--pink-7);
+  box-shadow: 0 6px 20px rgba(255, 92, 143, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ================= 移动端微调 ================= */
+@media (max-width: 480px){
+  html{ scroll-padding-top: 70px; }
+  body{ padding: 72px 18px 46px; }
+  .card{ padding: 40px 26px 24px; border-radius: 26px; }
+  .title{ letter-spacing: 6px; }
+  .divider .line{ width: 44px; }
+  .aura-1, .aura-2{ width: 300px; height: 300px; }
+  .aura-3, .aura-4{ width: 240px; height: 240px; }
+  .surprise-gif{ max-width: 72vw; max-height: 40vh; }
+  .finale-gif{ max-width: 68vw; }
+}
+</style>
+</head>
+<body>
+
+  <!-- 背景光晕 -->
+  <div class="aura aura-1"></div>
+  <div class="aura aura-2"></div>
+  <div class="aura aura-3"></div>
+  <div class="aura aura-4"></div>
+
+  <!-- 粒子层 -->
+  <canvas id="scene"></canvas>
+
+  <!-- 内容卡片 -->
+  <div class="content">
+    <div class="card">
+      <div class="top-ornament">✦ ❦ ✦</div>
+
+      <h1 class="title">写给你</h1>
+
+      <div class="divider">
+        <span class="line"></span>
+        <span class="heart-icon">❤</span>
+        <span class="line"></span>
+      </div>
+
+      <!-- ① 原始文案 -->
+      <div class="message" id="message">
+        <p>遇见你之后</p>
+        <p>日子都变得特别甜</p>
+        <p class="gap"></p>
+        <p>想把每一份小欢喜</p>
+        <p>悄悄藏在风里</p>
+        <p>吹到你身边</p>
+      </div>
+
+      <!-- ② 惊喜区域 -->
+      <div class="surprise" id="surprise">
+        <div class="surprise-text">🤣 被吓一跳吧 🤣</div>
+        <img src="xiaoni.gif" alt="惊喜" class="surprise-gif" id="surpriseGif">
+      </div>
+
+      <!-- ③ 最终章 -->
+      <div class="finale" id="finale">
+        <div class="finale-text" id="finaleText">
+          <p>也不知道你什么时候才能再次刷这张卡片，</p>
+          <p>也不知道你啥时候能找到这个彩蛋。</p>
+          <p>一星期？一个月？一年？</p>
+          <p>也可能在更久远的时间吧。</p>
+          <p>也没什么话，em，</p>
+          <p>祝你天天开心吧。</p>
+          <p>这个彩蛋会一直存在，一休尼！</p>
+        </div>
+
+        <div class="finale-time" id="finaleTime">2026.10.7.19.55</div>
+
+        <div class="finale-gif-wrap" id="finaleGifWrap">
+          <img src="maimeng.gif" alt="卖萌" class="finale-gif" id="maimengGif">
+        </div>
+
+        <div class="tap-hint" id="tapHint">👆 点击塔菲可以听到塔菲唱歌</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 返回 -->
+  <a href="index.html" class="back">← 返回</a>
+
+  <!-- 音频：tafei.mp3 -->
+  <audio id="tafeiAudio" src="tafei.mp3" preload="auto" loop></audio>
+
+<script>
+/* ==================== Canvas 粒子 ==================== */
+(function(){
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const isMobile = window.innerWidth < 768;
+
+  const petalColors = [
+    '#ff85b3', '#ffb3d1', '#ff6b9d', '#ffd6e7',
+    '#ff4d88', '#ffa6c9', '#ffc2dd'
+  ];
+
+  function heartPath(ctx, size){
+    ctx.beginPath();
+    for (let t = 0; t <= Math.PI * 2; t += 0.12){
+      const px = 16 * Math.pow(Math.sin(t), 3);
+      const py = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+      const sx = px * size / 16;
+      const sy = py * size / 16;
+      if (t === 0) ctx.moveTo(sx, sy);
+      else ctx.lineTo(sx, sy);
+    }
+    ctx.closePath();
+  }
+
+  class Petal{
+    constructor(){
+      this.reset();
+      this.y = Math.random() * h;
+    }
+    reset(){
+      this.x = Math.random() * w;
+      this.y = -40;
+      this.size = (isMobile ? 5 : 7) + Math.random() * 9;
+      this.speedY = 0.4 + Math.random() * 1.1;
+      this.speedX = (Math.random() - 0.5) * 0.6;
+      this.sway = Math.random() * Math.PI * 2;
+      this.swaySpeed = 0.008 + Math.random() * 0.02;
+      this.swayRange = 0.5 + Math.random() * 1.2;
+      this.rotate = Math.random() * Math.PI * 2;
+      this.rotateSpeed = (Math.random() - 0.5) * 0.02;
+      this.alpha = 0.55 + Math.random() * 0.4;
+      this.color = petalColors[Math.floor(Math.random() * petalColors.length)];
+    }
+    update(){
+      this.sway += this.swaySpeed;
+      this.x += this.speedX + Math.sin(this.sway) * this.swayRange;
+      this.y += this.speedY;
+      this.rotate += this.rotateSpeed;
+      if (this.y > h + 50) this.reset();
+    }
+    draw(){
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotate);
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = this.color;
+      heartPath(ctx, this.size);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  class Star{
+    constructor(){
+      this.reset();
+      this.phase = Math.random() * Math.PI * 2;
+    }
+    reset(){
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.size = 0.6 + Math.random() * 1.8;
+      this.baseAlpha = 0.25 + Math.random() * 0.5;
+      this.phaseSpeed = 0.012 + Math.random() * 0.03;
+      this.alpha = 0;
+    }
+    update(){
+      this.phase += this.phaseSpeed;
+      this.alpha = this.baseAlpha * (0.5 + 0.5 * Math.sin(this.phase));
+    }
+    draw(){
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(255, 180, 215, 0.9)';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  const petals = [];
+  const stars = [];
+
+  const petalCount = isMobile ? 26 : 48;
+  const starCount  = isMobile ? 40 : 80;
+
+  for (let i = 0; i < petalCount; i++) petals.push(new Petal());
+  for (let i = 0; i < starCount; i++) stars.push(new Star());
+
+  function animate(){
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars){ s.update(); s.draw(); }
+    for (const p of petals){ p.update(); p.draw(); }
+  }
+  animate();
+})();
+
+/* ==================== 漂浮小心形 ==================== */
+(function(){
+  const box = document.body;
+  const emojis = ['💗', '💕', '💖', '💞', '🩷', '🌸', '💘', '❣️'];
+  const COUNT = 9;
+
+  for (let i = 0; i < COUNT; i++){
+    const el = document.createElement('span');
+    el.className = 'floating-heart';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+    const top = 10 + Math.random() * 80;
+    const left = 5 + Math.random() * 90;
+    const size = 14 + Math.random() * 16;
+    const floatDuration = 5 + Math.random() * 4;
+    const floatDelay = -Math.random() * 5;
+    const fadeDelay = 0.8 + Math.random() * 1.5;
+
+    el.style.top = top + 'vh';
+    el.style.left = left + 'vw';
+    el.style.fontSize = size + 'px';
+    el.style.animationDuration = `${floatDuration}s, 1.5s`;
+    el.style.animationDelay = `${floatDelay}s, ${fadeDelay}s`;
+    el.style.animationIterationCount = 'infinite, 1';
+
+    box.appendChild(el);
+  }
+})();
+
+/* ==================== 点击塔菲冒小爱心 ==================== */
+function spawnPopHearts(originEl){
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  const emojis = ['💗', '💕', '💖', '💞', '🩷', '🌸'];
+  const COUNT = 9;
+
+  for (let i = 0; i < COUNT; i++){
+    const el = document.createElement('span');
+    el.className = 'pop-heart';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+    const angle = (i / COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+    const dist  = 70 + Math.random() * 90;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 20;
+    const size = 16 + Math.random() * 14;
+    const rot = (Math.random() - 0.5) * 60 + 'deg';
+
+    el.style.left = cx + 'px';
+    el.style.top  = cy + 'px';
+    el.style.fontSize = size + 'px';
+    el.style.setProperty('--dx', dx.toFixed(1) + 'px');
+    el.style.setProperty('--dy', dy.toFixed(1) + 'px');
+    el.style.setProperty('--rot', rot);
+    el.style.animationDelay = (i * 25) + 'ms';
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  }
+}
+
+/* ==================== 彩蛋时间线 ==================== */
+(function(){
+  const message    = document.getElementById('message');
+  const surprise   = document.getElementById('surprise');
+  const gif        = document.getElementById('surpriseGif');
+  const finale     = document.getElementById('finale');
+  const finaleTexts= document.querySelectorAll('#finaleText p');
+  const finaleTime = document.getElementById('finaleTime');
+  const finaleGifWrap = document.getElementById('finaleGifWrap');
+  const maimengGif = document.getElementById('maimengGif');
+  const tapHint    = document.getElementById('tapHint');
+  const tafeiAudio = document.getElementById('tafeiAudio');
+
+  const WIPE_START = 4600;
+  const WIPE_TIME  = 850;
+
+  /* ---------- 音频播放（带兜底重试） ---------- */
+  let tafeiPlaying = false;
+  let retryBound = false;
+
+  function fadeInVolume(){
+    let v = 0;
+    const target = 0.6;
+    const fade = setInterval(() => {
+      v += 0.04;
+      if (v >= target){
+        v = target;
+        clearInterval(fade);
+      }
+      tafeiAudio.volume = v;
+    }, 60);
+  }
+
+  function tryPlayTafei(){
+    if (tafeiPlaying) return;
+
+    tafeiAudio.volume = 0;
+    const playPromise = tafeiAudio.play();
+
+    if (playPromise && playPromise.then){
+      playPromise.then(() => {
+        tafeiPlaying = true;
+        console.log('✅ tafei.mp3 播放中');
+        fadeInVolume();
+      }).catch(err => {
+        console.warn('❌ tafei.mp3 自动播放被拦截，等用户点击后重试：', err);
+        bindRetryOnce();
+      });
+    } else {
+      tafeiPlaying = true;
+      fadeInVolume();
+    }
+  }
+
+  function bindRetryOnce(){
+    if (retryBound) return;
+    retryBound = true;
+
+    const retry = () => {
+      document.removeEventListener('click', retry);
+      document.removeEventListener('touchend', retry);
+      retryBound = false;
+
+      if (tafeiPlaying) return;
+
+      tafeiAudio.volume = 0;
+      const p = tafeiAudio.play();
+      if (p && p.then){
+        p.then(() => {
+          tafeiPlaying = true;
+          console.log('✅ 用户点击后 tafei.mp3 播放成功');
+          fadeInVolume();
+        }).catch(e => {
+          console.warn('❌ 点击后仍无法播放：', e);
+          bindRetryOnce();
+        });
+      } else {
+        tafeiPlaying = true;
+        fadeInVolume();
+      }
+    };
+
+    document.addEventListener('click', retry);
+    document.addEventListener('touchend', retry);
+  }
+
+  /* ---------- 点击塔菲：重播 tafei.mp3 + 冒小爱心 ---------- */
+  if (maimengGif){
+    maimengGif.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      spawnPopHearts(maimengGif);
+
+      tafeiAudio.currentTime = 0;
+      tafeiAudio.volume = 0;
+
+      const p = tafeiAudio.play();
+      if (p && p.then){
+        p.then(() => {
+          tafeiPlaying = true;
+          console.log('🎵 塔菲开始唱歌');
+          fadeInVolume();
+        }).catch(err => {
+          console.warn('❌ 点击塔菲播放失败：', err);
+        });
+      } else {
+        tafeiPlaying = true;
+        fadeInVolume();
+      }
+
+      maimengGif.style.transform = 'scale(0.94)';
+      setTimeout(() => {
+        maimengGif.style.transform = '';
+      }, 150);
+    });
+  }
+
+  /* ---------- 阶段 1：擦掉原始文案，显示惊喜 ---------- */
+  setTimeout(() => {
+    message.classList.add('wiping');
+
+    setTimeout(() => {
+      message.style.display = 'none';
+      surprise.classList.add('show');
+
+      if (gif){
+        gif.style.animation = 'none';
+        void gif.offsetWidth;
+        gif.style.animation = '';
+      }
+    }, WIPE_TIME);
+  }, WIPE_START);
+
+  /* ---------- 阶段 2：惊喜 gif 弹完后 1 秒，擦掉惊喜，进入最终章 ---------- */
+  const SURPRISE_AT = WIPE_START + WIPE_TIME;
+  const GIF_END     = SURPRISE_AT + 450 + 2000;
+  const WIPE2_START = GIF_END + 1000;
+
+  setTimeout(() => {
+    surprise.classList.add('wiping');
+
+    setTimeout(() => {
+      surprise.style.display = 'none';
+      finale.classList.add('show');
+
+      tryPlayTafei();
+
+      const LINE_GAP = 450;
+      finaleTexts.forEach((p, i) => {
+        setTimeout(() => {
+          p.classList.add('show-line');
+        }, i * LINE_GAP + 200);
+      });
+
+      const timeAt = finaleTexts.length * LINE_GAP + 500;
+      setTimeout(() => {
+        finaleTime.classList.add('show-time');
+      }, timeAt);
+
+      setTimeout(() => {
+        finaleGifWrap.classList.add('show-gif');
+
+        setTimeout(() => {
+          tapHint.classList.add('show');
+        }, 700);
+
+      }, timeAt + 800);
+
+    }, WIPE_TIME);
+  }, WIPE2_START);
+})();
+</script>
+</body>
+</html>
