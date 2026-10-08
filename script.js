@@ -284,9 +284,9 @@ const musicNext    = document.getElementById('musicNext');
 /* ★ 歌曲列表：想加歌就在这加 */
 const songs = [
 
-  { title: '老男孩',   src: 'laonanhai.mp3' },
-  { title: '野心',   src: 'yexin.mp3' },
-  { title: '心似烟火', src: 'xinshiyanhuo.mp3' }
+  { title: '老男孩',   src: 'https://360.avuoo.com/view.php/35b0ec4d301272515dc4fc637e1d16de.mp3' },
+  { title: '野心',   src: 'https://360.avuoo.com/view.php/295c355625f6846a8b53c71edfaf295e.mp3' },
+  { title: '心似烟火', src: 'https://360.avuoo.com/view.php/6a05a44b7d927785cb2138028b092994.mp3' }
   
 ];
 let currentSong = 0;
